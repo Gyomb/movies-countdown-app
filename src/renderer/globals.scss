@@ -1,0 +1,16 @@
+@import "~bulma/sass/utilities/initial-variables.sass"; 
+
+$primary: rgba(230, 199, 100, 0.575);
+$primary-invert: $black-ter;
+$success: rgb(104, 160, 79);
+
+@import "~bulma/bulma.sass";
+
+html {
+  background-color: $black-ter;
+  color: $light;
+}
+
+body {
+  padding: 1rem;
+}
