@@ -1,22 +1,22 @@
 # movie-countdown
 
-> An application to count until the movies the user is interested is released
+> An application to count the remaining days until the movies the user is interested in are released.
 
 #### Build Setup
 
 ``` bash
 # install dependencies
-npm install
+yarn
 
-# serve with hot reload at localhost:9080
-npm run dev
+# serve with hot reload
+yarn run dev
 
 # build electron application for production
-npm run build
+yarn run build
 
 
 # lint all JS/Vue component files in `src/`
-npm run lint
+yarn run lint
 
 ```
 
