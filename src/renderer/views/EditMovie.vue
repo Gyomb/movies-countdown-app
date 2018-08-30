@@ -17,6 +17,9 @@
           />
         </div>
       </div>
+      <drop class="box" @drop="storeAndDisplay">
+        drag here
+      </drop>
       <div class="field is-grouped">
         <div class="control">
           <router-link
@@ -59,6 +62,15 @@ export default {
         data: {id: this.$route.params.movieId, title: this.movietitle, releasedate: this.moviedate}
       })
       this.$router.push({name: 'home-page'})
+    },
+    storeAndDisplay (data, event) {
+      event.preventDefault()
+      const files = event.dataTransfer.files
+      const filenames = []
+      for (let i = 0; i < files.length; i++) {
+        filenames.push(files.item(i).name)
+      }
+      console.log(`You dropped files: ${JSON.stringify(filenames)}`)
     }
   }
 }
