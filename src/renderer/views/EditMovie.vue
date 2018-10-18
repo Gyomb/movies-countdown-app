@@ -1,6 +1,9 @@
 <template>
   <div class="section">
     <div class="container">
+      <h1 class="title has-text-light">
+        {{newMovie ? 'Add a  movie' : 'Edit'}}
+      </h1>
       <div class="field">
         <label class="label has-text-light">Title</label>
         <div class="control">
@@ -59,6 +62,7 @@ export default {
   components: {flatPickr},
   data () {
     return {
+      newMovie: false,
       movietitle: '',
       moviedate: '',
       loadedImagePath: '',
@@ -67,8 +71,10 @@ export default {
     }
   },
   created () {
-    this.movietitle = this.$store.state.movies.list[this.$route.params.movieId].title
-    this.moviedate = this.$store.state.movies.list[this.$route.params.movieId].releasedate
+    if (this.$store.state.movies.list[this.movieId]) {
+      this.movietitle = this.$store.state.movies.list[this.movieId].title
+      this.moviedate = this.$store.state.movies.list[this.movieId].releasedate
+    }
   },
   computed: {
     loadedImageSrc () {
@@ -76,8 +82,20 @@ export default {
       if (this.loadedImagePath) {
         return (this.imageIsHttp ? '' : fileprotocol) + this.loadedImagePath
       }
-      if (!this.imageEmptied && this.$store.state.movies.list[this.$route.params.movieId].imagepath) return fileprotocol + this.$store.state.movies.list[this.$route.params.movieId].imagepath
+      if (!this.imageEmptied &&
+      this.$store.state.movies.list[this.movieId] &&
+      this.$store.state.movies.list[this.movieId].imagepath) {
+        return fileprotocol + this.$store.state.movies.list[this.movieId].imagepath
+      }
       return false
+    },
+    movieId () {
+      if (this.$route.params.movieId) {
+        return this.$route.params.movieId
+      } else {
+        this.newMovie = true
+        return this.$store.state.movies.list.length
+      }
     },
     imageIsHttp () {
       return /^https?:\/\//.test(this.loadedImagePath)
@@ -86,11 +104,11 @@ export default {
   methods: {
     editMovie () {
       if (this.imageEmptied) {
-        this.$store.commit('ERASE_IMAGE_REF', this.$route.params.movieId)
+        this.$store.commit('ERASE_IMAGE_REF', this.movieId)
       }
       this.$store.dispatch({
         type: 'SAVE_MOVIE',
-        id: this.$route.params.movieId,
+        id: this.movieId,
         title: this.movietitle,
         releasedate: this.moviedate,
         imagename: this.loadedImageName,
