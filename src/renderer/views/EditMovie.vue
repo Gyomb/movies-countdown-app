@@ -19,11 +19,14 @@
       </div>
       <drop class="box" @drop="readAndDisplay">
         <span v-if="!loadedImageSrc">
-          drag an image here
+          Drag an image here from your disk<br>or paste its path in the field bellow
         </span>
         <figure v-else class="image-cropped">
           <img :src="loadedImageSrc">
         </figure>
+        <div class="control">
+          <input type="text" class="input" placeholder="/" v-model="loadedImagePath">
+        </div>
       </drop>
       <div class="field is-grouped">
         <div class="control">
@@ -63,10 +66,15 @@ export default {
   },
   computed: {
     loadedImageSrc () {
-      let protocol = 'file://'
-      if (this.loadedImagePath) return protocol + this.loadedImagePath
-      if (this.$store.state.movies.list[this.$route.params.movieId].imagepath) return protocol + this.$store.state.movies.list[this.$route.params.movieId].imagepath
+      let fileprotocol = 'file://'
+      if (this.loadedImagePath) {
+        return (this.imageIsHttp ? '' : fileprotocol) + this.loadedImagePath
+      }
+      if (this.$store.state.movies.list[this.$route.params.movieId].imagepath) return fileprotocol + this.$store.state.movies.list[this.$route.params.movieId].imagepath
       return false
+    },
+    imageIsHttp () {
+      return /^https?:\/\//.test(this.loadedImagePath)
     }
   },
   methods: {
@@ -77,9 +85,9 @@ export default {
         title: this.movietitle,
         releasedate: this.moviedate,
         imagename: this.loadedImageName,
-        imagepath: this.loadedImagePath
-      })
-      this.$router.push({name: 'home-page'})
+        imagepath: this.loadedImagePath,
+        isHttp: this.imageIsHttp
+      }).then(this.$router.push({name: 'home-page'}))
     },
     readAndDisplay (data, event) {
       event.preventDefault()
@@ -88,8 +96,13 @@ export default {
       for (let i = 0; i < files.length; i++) {
         filenames.push(files.item(i).name)
       }
-      this.loadedImagePath = files[0].path
-      this.loadedImageName = files[0].name
+      if (files[0]) {
+        this.loadedImagePath = files[0].path
+        this.loadedImageName = files[0].name
+      } else {
+        console.log(data)
+        console.log(event)
+      }
     }
   }
 }

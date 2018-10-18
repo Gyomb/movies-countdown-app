@@ -2,6 +2,9 @@ import Vue from 'vue'
 import { remote } from 'electron'
 import fs from 'fs'
 import path from 'path'
+import axios from 'axios'
+
+axios.defaults.adapter = require('axios/lib/adapters/http')
 
 const userData = remote.app.getPath('userData')
 const persitentFileName = ''
@@ -84,36 +87,57 @@ const actions = {
       type: 'SAVE_PERSISTENT_DATA'
     })
   },
-  SAVE_MOVIE ({state, dispatch, commit}, {id, title, releasedate, imagename, imagepath}) {
+  SAVE_MOVIE ({state, dispatch, commit}, {id, title, releasedate, imagename, imagepath, isHttp}) {
     if (!state.list[id]) {
       commit('ADD_MOVIE', {title, releasedate})
       id = state.list.length - 1
     }
-    if (imagepath && imagename) {
-      let newImagepath = path.join(imagesUserFilePath, imagename)
+    if (imagepath) {
+      if (!imagename) {
+        imagename = imagepath.match(/[\w.*_-]+\.[\w-]{2,5}$/)
+        if (imagename !== null) {
+          imagename = imagename[0]
+        }
+      }
+      var newImagepath = path.join(imagesUserFilePath, imagename)
       if (newImagepath !== imagepath) {
-        fs.readFile(imagepath, (err, data) => {
-          if (err) {
-            alert('An error occurred reading the file :' + err.message)
-            return
-          }
-          fs.writeFile(newImagepath, data, (err) => {
+        if (isHttp) {
+          axios({
+            method: 'get',
+            url: imagepath,
+            responseType: 'stream'
+          })
+            .then(response => {
+              response.data.pipe(fs.createWriteStream(newImagepath))
+                .on('close', saveAndRegisterImage)
+            })
+        } else {
+          fs.readFile(imagepath, (err, data) => {
             if (err) {
-              return alert('An error occurred creating the file ' + err.message)
+              alert('An error occurred reading the file :' + err.message)
+              return
             }
-            dispatch({
-              type: 'MUTATE_AND_SAVE',
-              mutation: 'EDIT_MOVIE',
-              data: {
-                id,
-                title,
-                releasedate,
-                imagepath: newImagepath
+            fs.writeFile(newImagepath, data, 'binary', (err) => {
+              if (err) {
+                return alert('An error occurred creating the file ' + err.message)
               }
+              saveAndRegisterImage(data)
             })
           })
-        })
+        }
       }
+    }
+    function saveAndRegisterImage () {
+      dispatch({
+        type: 'MUTATE_AND_SAVE',
+        mutation: 'EDIT_MOVIE',
+        data: {
+          id,
+          title,
+          releasedate,
+          imagepath: newImagepath
+        }
+      })
     }
   }
 }
