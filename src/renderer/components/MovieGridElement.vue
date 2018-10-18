@@ -1,5 +1,7 @@
 <template>
-  <li class="movie" :class="{'add': !movieData}">
+  <li class="movie" :class="{'add': !movieData}"
+    :style="imageBg"
+  >
     <template v-if="movieData">
     <div class="movie-header">
       <div class="movie-controls">
@@ -37,6 +39,15 @@ export default {
     },
     movieId: Number
   },
+  computed: {
+    imageBg () {
+      let movieImagepath = this.$store.state.movies.list[this.movieId] ? this.$store.state.movies.list[this.movieId].imagepath : false
+      if (movieImagepath) {
+        return `background-image:linear-gradient(rgba(0,0,0,.5) 50%, rgba(0,0,0,.0)), url('file://${movieImagepath}')`
+      }
+      return false
+    }
+  },
   methods: {
     deleteMovie () {
       this.$store.dispatch({
@@ -55,6 +66,8 @@ export default {
 <style lang="scss">
   .movie{
     background-color: $dark;
+    background-size: 100% auto;
+    background-repeat: no-repeat;
     color: $light;
     text-align: center;
     padding: 1rem;
@@ -96,7 +109,7 @@ export default {
     display: inline-block;
     cursor: pointer;
     margin-left: .5em;
-    color: $grey;
+    color: $grey-light;
     &:hover{
       color: $danger;
     }

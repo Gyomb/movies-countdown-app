@@ -13,7 +13,7 @@ export default new Router({
     {
       path: '/add-movie',
       name: 'add-movie',
-      component: require('@/views/AddMovie').default
+      component: require('@/views/EditMovie').default
     },
     {
       path: '/edit-movie/:movieId',
