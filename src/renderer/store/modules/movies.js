@@ -50,6 +50,11 @@ const mutations = {
   },
   REGISTER_APP_DATA (state, data) {
     state.list = data.list
+  },
+  ERASE_IMAGE_REF (state, movieId) {
+    if (state.list[movieId]) {
+      Vue.set(state.list[movieId], 'imagepath', '')
+    }
   }
 }
 

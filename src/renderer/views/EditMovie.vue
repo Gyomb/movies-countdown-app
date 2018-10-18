@@ -21,9 +21,14 @@
         <span v-if="!loadedImageSrc">
           Drag an image here from your disk<br>or paste its path in the field bellow
         </span>
-        <figure v-else class="image-cropped">
-          <img :src="loadedImageSrc">
-        </figure>
+        <div v-else class="image-cropped">
+          <figure>
+            <img :src="loadedImageSrc">
+          </figure>
+          <div role="button" class="close-btn top-corner" @click="eraseImage">
+            <fa-icon icon="times-circle" />
+          </div>
+        </div>
         <div class="control">
           <input type="text" class="input" placeholder="/" v-model="loadedImagePath">
         </div>
@@ -57,7 +62,8 @@ export default {
       movietitle: '',
       moviedate: '',
       loadedImagePath: '',
-      loadedImageName: ''
+      loadedImageName: '',
+      imageEmptied: false
     }
   },
   created () {
@@ -70,7 +76,7 @@ export default {
       if (this.loadedImagePath) {
         return (this.imageIsHttp ? '' : fileprotocol) + this.loadedImagePath
       }
-      if (this.$store.state.movies.list[this.$route.params.movieId].imagepath) return fileprotocol + this.$store.state.movies.list[this.$route.params.movieId].imagepath
+      if (!this.imageEmptied && this.$store.state.movies.list[this.$route.params.movieId].imagepath) return fileprotocol + this.$store.state.movies.list[this.$route.params.movieId].imagepath
       return false
     },
     imageIsHttp () {
@@ -79,6 +85,9 @@ export default {
   },
   methods: {
     editMovie () {
+      if (this.imageEmptied) {
+        this.$store.commit('ERASE_IMAGE_REF', this.$route.params.movieId)
+      }
       this.$store.dispatch({
         type: 'SAVE_MOVIE',
         id: this.$route.params.movieId,
@@ -88,6 +97,11 @@ export default {
         imagepath: this.loadedImagePath,
         isHttp: this.imageIsHttp
       }).then(this.$router.push({name: 'home-page'}))
+    },
+    eraseImage () {
+      this.loadedImagePath = ''
+      this.loadedImageName = ''
+      this.imageEmptied = true
     },
     readAndDisplay (data, event) {
       event.preventDefault()
@@ -99,6 +113,7 @@ export default {
       if (files[0]) {
         this.loadedImagePath = files[0].path
         this.loadedImageName = files[0].name
+        this.imageEmptied = false
       } else {
         console.log(data)
         console.log(event)
@@ -119,13 +134,27 @@ export default {
   padding: 0;
   padding-top: 56.25%;
   overflow: hidden;
-  > img {
+  img {
     bottom: 0;
     left: 0;
     position: absolute;
     right: 0;
     top: 0;
   }
+}
+
+.close-btn{
+  display: inline-block;
+  cursor: pointer;
+  margin-left: .5em;
+  &:hover{
+    color: $danger;
+  }
+}
+.top-corner {
+  position: absolute;
+  top: 0;
+  right: 5px;
 }
 
 </style>
