@@ -90,7 +90,7 @@ export default {
       return false
     },
     movieId () {
-      if (this.$route.params.movieId) {
+      if (this.$store.state.movies.list[this.$route.params.movieId]) {
         return this.$route.params.movieId
       } else {
         this.newMovie = true

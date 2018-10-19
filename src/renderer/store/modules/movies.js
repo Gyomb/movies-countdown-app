@@ -131,6 +131,16 @@ const actions = {
           })
         }
       }
+    } else {
+      dispatch({
+        type: 'MUTATE_AND_SAVE',
+        mutation: 'EDIT_MOVIE',
+        data: {
+          id,
+          title,
+          releasedate
+        }
+      })
     }
     function saveAndRegisterImage () {
       dispatch({
