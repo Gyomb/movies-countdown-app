@@ -1,6 +1,6 @@
 {
   "name": "movie-countdown",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "author": "Guillaume Barbier <gyomb.graphics@gmail.com>",
   "description": "An application to count until the movies the user is interested is released",
   "license": null,
