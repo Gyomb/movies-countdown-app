@@ -65,6 +65,7 @@ export default {
 
 <style lang="scss">
   .movie{
+    position: relative;
     background-color: $dark;
     background-size: 100% auto;
     background-repeat: no-repeat;
@@ -96,14 +97,18 @@ export default {
     }
   }
   .movie-header{
-    text-align: right;
+    text-align: left;
     margin-bottom: 1rem;
   }
   .movie-controls {
-    display: flex;
+    display: none;
+    position: absolute;
     margin-top: -.5em;
     margin-bottom: .1em;
-    justify-content: flex-end;
+    right: .8em;
+  }
+  .movie:hover .movie-controls {
+    display: flex;
   }
   .close-btn, .edit-btn{
     display: inline-block;
